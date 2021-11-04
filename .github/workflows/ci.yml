@@ -57,6 +57,34 @@ jobs:
         run-test: true
         ctest-options: -V
         configure-options: -DCPR_ENABLE_LINTING=ON
+        
+  cpcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2.2.0
+      with:
+        submodules: true
+    - name: Update package list
+      run: sudo apt update
+    - name: Install libssl-dev
+      run: sudo apt install cppcheck
+    - name: Install clang-tidy
+      run: cppcheck --enable=all -I include/ cpr/
+    - name: "[Release g++] Build & Test"
+      env:
+        CPR_BUILD_TESTS: ON
+      uses: ashutoshvarma/action-cmake-build@master
+      with:
+        build-dir: ${{github.workspace}}/build
+        source-dir: ${{github.workspace}}
+        cc: clang
+        cxx: clang++
+        build-type: Release
+        run-test: true
+        ctest-options: -V
+        configure-options: -DCPR_ENABLE_LINTING=ON
+
 
   ubuntu-20-static-gcc-ssl:
     runs-on: ubuntu-20.04
